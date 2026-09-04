@@ -1,5 +1,7 @@
 package com.example.productmanager.controller;
 
+import com.example.productmanager.dto.ProductRequest;
+import com.example.productmanager.dto.ProductResponse;
 import com.example.productmanager.entity.Product;
 import com.example.productmanager.service.ProductService;
 import jakarta.validation.Valid;
@@ -17,20 +19,31 @@ public class ProductController {
     }
 
     @PostMapping
-    public Product createProduct(@Valid @RequestBody Product product){
-        return productService.createProduct(product);
+    public ProductResponse createProduct(@Valid @RequestBody ProductRequest productRequest){
+        return productService.createProduct(productRequest);
     }
     @GetMapping
-    public List<Product> getAllProducts(){
+    public List<ProductResponse> getAllProducts(){
         return productService.getAllProducts();
     }
+
     @GetMapping("/{id}")
-    public Product getByid(@PathVariable Long id){
+    public ProductResponse getProductByid(@PathVariable Long id){
         return productService.getProductById(id);
     }
+
+    @GetMapping("/search")
+    public List<ProductResponse> searchProducts(@RequestParam String name) {
+        return productService.searchProducts(name);
+    }
+    @GetMapping("/filter")
+    public List<ProductResponse> filterProducts(@RequestParam boolean active) {
+        return productService.filterProductsByActive(active);
+    }
+
     @PutMapping("/{id}")
-    public Product updateProduct(@PathVariable Long id,@Valid @RequestBody Product product){
-        return productService.updateProductById(id,product);
+    public Product updateProduct(@PathVariable Long id,@Valid @RequestBody ProductRequest productRequest){
+        return productService.updateProductById(id,productRequest);
     }
     @DeleteMapping("/{id}")
     public void deleteProduct(@PathVariable Long id){

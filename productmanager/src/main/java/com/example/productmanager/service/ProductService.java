@@ -1,11 +1,12 @@
 package com.example.productmanager.service;
 
+import com.example.productmanager.dto.ProductResponse;
 import com.example.productmanager.entity.Product;
 import com.example.productmanager.repository.ProductRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
+import com.example.productmanager.dto.ProductRequest;
 import java.util.List;
 
 @Service
@@ -15,19 +16,59 @@ public class ProductService {
     public ProductService(ProductRepository productRepository) {
         this.productRepository = productRepository;
     }
-    public Product createProduct(Product product){
-        return productRepository.save(product);
+
+    public ProductResponse createProduct(ProductRequest productRequest){
+        Product product = new Product();
+
+        product.setProductName(productRequest.getProductName());
+        product.setPrice(productRequest.getPrice());
+        product.setStock(productRequest.getStock());
+
+        Product savedProduct = productRepository.save(product);
+        ProductResponse response = new ProductResponse();
+
+        response.setId(savedProduct.getId());
+        response.setProductName(savedProduct.getProductName());
+        response.setPrice(savedProduct.getPrice());
+        response.setStock(savedProduct.getStock());
+        response.setActive(savedProduct.isActive());
+
+        return response;
     }
-    public List<Product> getAllProducts(){
-        return productRepository.findAll();
+    public List<ProductResponse> getAllProducts(){
+        List<Product> products = productRepository.findAll();
+
+        return products.stream()
+                .map(product -> {
+                    ProductResponse response = new ProductResponse();
+
+                    response.setId(product.getId());
+                    response.setProductName(product.getProductName());
+                    response.setPrice(product.getPrice());
+                    response.setStock(product.getStock());
+                    response.setActive(product.isActive());
+
+                    return response;
+                })
+                .toList();
     }
-    public Product getProductById(Long id){
-        return productRepository.findById(id)
+
+    public ProductResponse getProductById(Long id){
+        Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                                 HttpStatus.NOT_FOUND,"Product not found"
                         ));
+        ProductResponse response = new ProductResponse();
+
+        response.setId(product.getId());
+        response.setProductName(product.getProductName());
+        response.setPrice(product.getPrice());
+        response.setStock(product.getStock());
+        response.setActive(product.isActive());
+
+        return response;
     }
-    public Product updateProductById(Long id, Product product) {
+    public Product updateProductById(Long id, ProductRequest productRequest) {
 
         Product existingProduct = productRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
@@ -35,9 +76,9 @@ public class ProductService {
                         "Product not found"
                 ));
 
-        existingProduct.setProductName(product.getProductName());
-        existingProduct.setPrice(product.getPrice());
-        existingProduct.setStock(product.getStock());
+        existingProduct.setProductName(productRequest.getProductName());
+        existingProduct.setPrice(productRequest.getPrice());
+        existingProduct.setStock(productRequest.getStock());
 
         return productRepository.save(existingProduct);
     }
@@ -49,6 +90,44 @@ public class ProductService {
                 ));
 
         productRepository.delete(existingProduct);
+    }
+
+    public List<ProductResponse> searchProducts(String name) {
+
+        List<Product> products =
+                productRepository.findByProductNameContainingIgnoreCase(name);
+
+        return products.stream()
+                .map(product -> {
+                    ProductResponse response = new ProductResponse();
+
+                    response.setId(product.getId());
+                    response.setProductName(product.getProductName());
+                    response.setPrice(product.getPrice());
+                    response.setStock(product.getStock());
+                    response.setActive(product.isActive());
+
+                    return response;
+                })
+                .toList();
+    }
+    public List<ProductResponse> filterProductsByActive(boolean active) {
+
+        List<Product> products = productRepository.findByActive(active);
+
+        return products.stream()
+                .map(product -> {
+                    ProductResponse response = new ProductResponse();
+
+                    response.setId(product.getId());
+                    response.setProductName(product.getProductName());
+                    response.setPrice(product.getPrice());
+                    response.setStock(product.getStock());
+                    response.setActive(product.isActive());
+
+                    return response;
+                })
+                .toList();
     }
     }
 
