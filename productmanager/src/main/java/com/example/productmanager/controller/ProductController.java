@@ -5,10 +5,15 @@ import com.example.productmanager.dto.ProductResponse;
 import com.example.productmanager.entity.Product;
 import com.example.productmanager.service.ProductService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.data.domain.Pageable;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/products")
@@ -20,8 +25,12 @@ public class ProductController {
     }
 
     @PostMapping
-    public ProductResponse createProduct(@Valid @RequestBody ProductRequest productRequest){
-        return productService.createProduct(productRequest);
+    public ResponseEntity<ProductResponse> createProduct(@Valid @RequestBody ProductRequest productRequest){
+        ProductResponse response = productService.createProduct(productRequest);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(response);
     }
     @GetMapping
     public List<ProductResponse> getAllProducts(Pageable pageable){
@@ -47,7 +56,11 @@ public class ProductController {
         return productService.updateProductById(id,productRequest);
     }
     @DeleteMapping("/{id}")
-    public void deleteProduct(@PathVariable Long id){
+    public ResponseEntity<Map<String, String>> deleteProduct(@PathVariable Long id){
         productService.deleteProductById(id);
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Product deleted successfully");
+
+        return ResponseEntity.ok(response);
     }
 }

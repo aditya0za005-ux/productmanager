@@ -2,11 +2,10 @@ package com.example.productmanager.service;
 
 import com.example.productmanager.dto.ProductResponse;
 import com.example.productmanager.entity.Product;
+import com.example.productmanager.exception.ProductNotFoundException;
 import com.example.productmanager.repository.ProductRepository;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import com.example.productmanager.dto.ProductRequest;
 
 import org.springframework.data.domain.Pageable;
@@ -58,9 +57,7 @@ public class ProductService {
 
     public ProductResponse getProductById(Long id){
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                                HttpStatus.NOT_FOUND,"Product not found"
-                        ));
+                .orElseThrow(() -> new ProductNotFoundException("Product not found"));
         ProductResponse response = new ProductResponse();
 
         response.setId(product.getId());
@@ -74,10 +71,7 @@ public class ProductService {
     public Product updateProductById(Long id, ProductRequest productRequest) {
 
         Product existingProduct = productRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Product not found"
-                ));
+                .orElseThrow(() -> new ProductNotFoundException("Product not found"));
 
         existingProduct.setProductName(productRequest.getProductName());
         existingProduct.setPrice(productRequest.getPrice());
@@ -87,10 +81,7 @@ public class ProductService {
     }
     public void deleteProductById(Long id) {
         Product existingProduct = productRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Product not found"
-                ));
+                .orElseThrow(() -> new ProductNotFoundException("Product not found"));
 
         productRepository.delete(existingProduct);
     }
