@@ -7,6 +7,7 @@ import com.example.productmanager.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 @RestController
@@ -23,8 +24,8 @@ public class ProductController {
         return productService.createProduct(productRequest);
     }
     @GetMapping
-    public List<ProductResponse> getAllProducts(){
-        return productService.getAllProducts();
+    public List<ProductResponse> getAllProducts(Pageable pageable){
+        return productService.getAllProducts(pageable);
     }
 
     @GetMapping("/{id}")

@@ -3,10 +3,13 @@ package com.example.productmanager.service;
 import com.example.productmanager.dto.ProductResponse;
 import com.example.productmanager.entity.Product;
 import com.example.productmanager.repository.ProductRepository;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import com.example.productmanager.dto.ProductRequest;
+
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 @Service
@@ -35,8 +38,8 @@ public class ProductService {
 
         return response;
     }
-    public List<ProductResponse> getAllProducts(){
-        List<Product> products = productRepository.findAll();
+    public List<ProductResponse> getAllProducts(Pageable pageable){
+        Page<Product> products = productRepository.findAll(pageable);
 
         return products.stream()
                 .map(product -> {
