@@ -15,10 +15,12 @@ import org.springframework.stereotype.Service;
 public class AuthService {
     private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
+    private JwtService jwtService;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     public SignUpResponse signup(SignUpRequest signUpRequest){
@@ -46,7 +48,9 @@ public class AuthService {
             throw new InvalidCredentialsException("Invalid username or password");
         }
         LoginResponse loginResponse = new LoginResponse();
-        loginResponse.setMessage("Login successful");
+        String token = jwtService.generateToken(user.getUsername());
+
+        loginResponse.setToken(token);
 
         return loginResponse;
     }
