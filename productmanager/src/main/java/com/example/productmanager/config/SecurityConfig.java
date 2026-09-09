@@ -34,16 +34,36 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
 
+                        // Public endpoints
                         .requestMatchers(
                                 HttpMethod.POST,
                                 "/api/auth/signup",
                                 "/api/auth/login"
                         ).permitAll()
 
+                        // Anyone can view products
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/products/**"
                         ).permitAll()
+
+                        // Only ADMIN can create products
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/products/**"
+                        ).hasRole("ADMIN")
+
+                        // Only ADMIN can update products
+                        .requestMatchers(
+                                HttpMethod.PUT,
+                                "/api/products/**"
+                        ).hasRole("ADMIN")
+
+                        // Only ADMIN can delete products
+                        .requestMatchers(
+                                HttpMethod.DELETE,
+                                "/api/products/**"
+                        ).hasRole("ADMIN")
 
                         .anyRequest().authenticated()
                 )
